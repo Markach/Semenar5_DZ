@@ -2,10 +2,8 @@ import tkinter as tk
 from tkinter import messagebox
 from loguru import logger
 # import log                                       #  logger.add('debug.log', format='{time} {level} {message}', level='DEBUG', serialize=True) 
+                                                      # то что можно в это log положить красиво ошибки подсвечивает
 
-logger.add('debug.json', format='{time} {level} {message}', level='DEBUG', serialize=True) 
-                                                      # то что можно в это log.py положить красиво ошибки подсвечивает/ пока закомментила
-import task as t
 def add_digit(digit):
     value = calc.get()    
     if  value[0]=='0' and len(value)==1:     
@@ -20,29 +18,34 @@ def add_complex_char(compl):
 
 def add_point_char(point):
     value = calc.get()
-   
     calc.delete(0,tk.END)
-    calc.insert(0,value+point)            
+    calc.insert(0,value+point) 
+
+def add_bracket_char(bracket):
+    value = calc.get()
+    calc.delete(0,tk.END)
+    calc.insert(0,value+bracket) 
+
     
 
 def add_operation(operation):
     value = calc.get()                                                   # конкатенация, чтобы числа добавлялись справа
     if value[-1] in '-+/*':
         value = value[:-1]
-    elif '+' in value or  '-' in value or '*' in value or '/' in value:   # если последним в поле ввода стоит операция, то мы вычисляем значение и продолжаем ввод, напр
-        calculate()                                                      # 7+8-, а так получим 15- и дальше можно продолжать ввод чисел
-        value = calc.get() 
+    # elif '+' in value or  '-' in value or '*' in value or '/' in value:   # если последним в поле ввода стоит операция, то мы вычисляем значение и продолжаем ввод, напр
+    #     calculate()                                                      # 7+8-, а так получим 15- и дальше можно продолжать ввод чисел
+    #     value = calc.get() 
     calc.delete(0,tk.END)
     calc.insert(0,value+operation)
 
 
 @logger.catch 
 def calculate():
-    value = calc.get()       # функция принимает значение value (это строка, состоящяя из введенных 'число операция число')   '5+6'
+    value = calc.get()       # функция принимает значение value (это строка, состоящяя из введенных 'число опнрация число')
     if value[-1] in '+-/*':   # если строка заканчивается на операцию, тогда мы к числу прибавим это же число (так в калькуляторах)
         value = value + value[:-1]  
     calc.delete(0,tk.END)       # очищаем поле ввода
-    calc.insert(0, t.counter(value))     # вставляем значение, которое вычисляем при помощи функции eval
+    calc.insert(0, eval(value))     # вставляем значение, которое вычисляем при помощи функции eval
   
 
 def clear():
@@ -76,7 +79,11 @@ def press_key(event):
     elif event.char =='j':          
         add_complex_char(event.char) 
     elif event.char =='.':          
-        add_point_char(event.char)       
+        add_point_char(event.char) 
+    elif event.char =='(':          
+        add_bracket_char(event.char)
+    elif event.char ==')':          
+        add_bracket_char(event.char)                 
 
 win = tk.Tk()
 win.geometry(f"240x335+100+200")
@@ -102,6 +109,8 @@ make_digit_button('9').grid(row=3, column=2, stick='wens',padx=5, pady=5)
 make_digit_button('0').grid(row=4, column=0, stick='wens',padx=5, pady=5)
 make_digit_button('j').grid(row=5, column=1, stick='wens',padx=5, pady=5)
 make_digit_button('.').grid(row=4, column=1, stick='wens',padx=5, pady=5)
+make_digit_button('(').grid(row=5, column=2, stick='wens',padx=5, pady=5)
+make_digit_button(')').grid(row=5, column=3, stick='wens',padx=5, pady=5)
 
 make_operation_button('+').grid(row=1, column=3, stick='wens',padx=5, pady=5)
 make_operation_button('-').grid(row=2, column=3, stick='wens',padx=5, pady=5)
